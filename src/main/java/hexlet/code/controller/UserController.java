@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequestMapping("/api/users")
 public class UserController {
     private final List<User> users = new ArrayList<>();
+    //генерируем уникальный id
     private final AtomicInteger userIdCounter = new AtomicInteger(1);
 
     @GetMapping

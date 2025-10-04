@@ -15,10 +15,15 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-devtools")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
 
     implementation("org.projectlombok:lombok:1.18.40")
     annotationProcessor("org.projectlombok:lombok:1.18.40")
+
+    runtimeOnly("com.h2database:h2")
 }
 
 tasks.withType<Test> {

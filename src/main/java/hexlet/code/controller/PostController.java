@@ -1,6 +1,9 @@
 package hexlet.code.controller;
 
 import hexlet.code.model.Post;
+import hexlet.code.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,28 +15,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
-    private final List<Post> posts = new ArrayList<>();
+    //private final List<Post> posts = new ArrayList<>();
+    @Autowired
+    private PostRepository postRepository;
 
     @GetMapping
-    public ResponseEntity<List<Post>> indexPosts(
+    @ResponseStatus(HttpStatus.OK)
+    public List<Post> indexPosts(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer limit) {
-        var post = posts.stream().skip((long) (page - 1) * limit).limit(limit).toList();
 
-        return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(posts.size()))
-                .body(post);
+        var posts = postRepository.findAll();
+
+        return posts.stream().skip((long) (page - 1) * limit).limit(limit).toList();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> showPost(@PathVariable String id) {
+    @ResponseStatus(HttpStatus.OK)
+    public Post showPost(@PathVariable Long id) {
 
-        return posts.stream()
-                .filter(p -> p.getSlug().equals(id))
-                .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-
+        return postRepository.findById(id).get();
         //var post = posts.stream()
         //        .filter(p -> p.getSlug().equals(id))
         //        .findFirst();
@@ -41,37 +42,29 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        posts.add(post);
-        URI location = URI.create("/api/posts/" + post.getSlug());
-        return ResponseEntity.created(location).body(post);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Post createPost(@RequestBody Post post) {
 
-        //return ResponseEntity.status(HttpStatus.CREATED)
-        //        .body(post);
+        return postRepository.save(post);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable String id, @RequestBody Post data) {
-        var maybePost = posts.stream()
-                .filter(p -> p.getSlug().equals(id))
-                .findFirst();
+    @ResponseStatus(HttpStatus.OK)
+    public Post updatePost(@PathVariable Long id, @RequestBody Post data) {
+        var maybePost = postRepository.findById(id);
         if (maybePost.isPresent()) {
             var post = maybePost.get();
             post.setTitle(data.getTitle());
-            post.setAuthor(data.getAuthor());
             post.setContent(data.getContent());
-            post.setCreatedAt(data.getCreatedAt());
-            return ResponseEntity.ok(post);
+            post.setPublished(data.isPublished());
+            return postRepository.save(post);
         }
-        return ResponseEntity.notFound().build();
+        return null;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> destroyPost(@PathVariable String id) {
-        boolean removed = posts.removeIf(p -> p.getSlug().equals(id));
-        if (removed) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void destroyPost(@PathVariable Long id) {
+        postRepository.deleteById(id);
     }
 }

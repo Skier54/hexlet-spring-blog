@@ -1,10 +1,6 @@
 package hexlet.code.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
@@ -12,11 +8,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDate;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "posts")
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
 @Getter
 @Setter
@@ -38,6 +40,13 @@ public class Post {
 
     @NotNull(message = "Статус публикации должен быть указан")
     private boolean published;
+
+    @LastModifiedDate
+    private LocalDate updatedAt;
+
+    @CreatedDate
+    @Column(nullable = false, updatable = false)  //не может быть ноль, не изменяемо
+    private LocalDate createdAt;
 
 //    public void setTitle(String title) {
 //        this.title = title;

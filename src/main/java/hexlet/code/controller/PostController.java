@@ -5,6 +5,10 @@ import hexlet.code.model.Post;
 import hexlet.code.repository.PostRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,18 +21,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
+
     @Autowired
     private PostRepository postRepository;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Post> indexPosts(
+    public Page<Post> indexPosts(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer limit) {
+            @RequestParam(defaultValue = "10") Integer size) {
 
-        var posts = postRepository.findAll();
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return postRepository.findByPublishedTrue(pageable);
 
-        return posts.stream().skip((long) (page - 1) * limit).limit(limit).toList();
+        //var posts = postRepository.findAll();
+        //return posts.stream().skip((long) (page - 1) * limit).limit(limit).toList();
     }
 
     @GetMapping("/{id}")

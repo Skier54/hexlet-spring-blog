@@ -1,7 +1,9 @@
 plugins {
     java
+    jacoco
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.3"
+    id("org.sonarqube") version "6.3.1.5724"
 }
 
 group = "hexlet.code"
@@ -34,4 +36,28 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestReport)
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "skier54_hexlet-spring-blog")
+        property("sonar.organization", "skier54") // для SonarCloud
+        property("sonar.host.url", "https://sonarcloud.io") // или ваш SonarQube
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.junit.reportPaths", "build/test-results/test")
+        property("sonar.jacoco.reportPaths", "build/jacoco/test.exec")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+    }
 }

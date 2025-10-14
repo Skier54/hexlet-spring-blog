@@ -33,7 +33,7 @@ public class User {
 
     private String firstName;
     private String lastName;
-    private LocalDate birthday;
+    //private LocalDate birthday;
 
     @LastModifiedDate
     private LocalDate updatedAt;

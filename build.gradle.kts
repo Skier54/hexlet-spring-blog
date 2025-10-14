@@ -17,12 +17,17 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-devtools")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+    implementation("net.datafaker:datafaker:2.5.0")
 
     implementation("org.projectlombok:lombok:1.18.40")
     annotationProcessor("org.projectlombok:lombok:1.18.40")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.2.2")
 
     runtimeOnly("com.h2database:h2")
 }

@@ -5,6 +5,9 @@ import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,13 +27,15 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<User> indexUsers(
+    public Page<User> indexUsers(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer limit) {
+            @RequestParam(defaultValue = "10") Integer size) {
 
-        var users = userRepository.findAll();
+        Pageable pageable = PageRequest.of(page, size);
+        return userRepository.findAll(pageable);
+        //var users = userRepository.findAll();
 
-        return users.stream().skip((long) (page - 1) * limit).limit(limit).toList();
+        //return users.stream().skip((long) (page - 1) * size).limit(size).toList();
     }
 
     @GetMapping("/{id}")
@@ -62,7 +67,7 @@ public class UserController {
         user.setEmail(data.getEmail());
         user.setFirstName(data.getFirstName());
         user.setLastName(data.getLastName());
-        user.setBirthday(data.getBirthday());
+        //user.setBirthday(data.getBirthday());
 
         return userRepository.save(user);
     }

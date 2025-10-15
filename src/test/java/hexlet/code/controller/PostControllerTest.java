@@ -1,6 +1,8 @@
 package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.model.Post;
+import hexlet.code.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,6 +27,9 @@ class PostControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private PostRepository postRepository;
 
     //Получение списка постов
     @Test
@@ -60,10 +65,15 @@ class PostControllerTest {
     // получения поста по id
     @Test
     void getPostById_returns200_andPost() throws Exception {
-        var postId = 1L;
-        mockMvc.perform(get("/api/posts/{id}", postId))
+        var post = new Post();
+        post.setTitle("Hello");
+        post.setContent("Hello Hello life!");
+        post.setPublished(true);
+        postRepository.save(post);
+
+        mockMvc.perform(get("/api/posts/{id}", post.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(postId))
+                .andExpect(jsonPath("$.id").value(post.getId()))
                 .andExpect(jsonPath("$.title").exists())
                 .andExpect(jsonPath("$.content").exists())
                 .andExpect(jsonPath("$.published").exists());
@@ -72,7 +82,11 @@ class PostControllerTest {
     //обновления поста
     @Test
     void updatePost_returns200_andPost() throws Exception {
-        var postId = 1L;
+        var post = new Post();
+        post.setTitle("Hello");
+        post.setContent("Hello Hello life!");
+        post.setPublished(true);
+        postRepository.save(post);
 
         var updatedData = Map.of(
                 "title", "Updated",
@@ -80,11 +94,11 @@ class PostControllerTest {
                 "published", "true"
         );
 
-        mockMvc.perform(put("/api/posts/{id}", postId)
+        mockMvc.perform(put("/api/posts/{id}", post.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedData)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(postId))
+                .andExpect(jsonPath("$.id").value(post.getId()))
                 .andExpect(jsonPath("$.title").value("Updated"))
                 .andExpect(jsonPath("$.content").value("contentName"))
                 .andExpect(jsonPath("$.published").value("true"));

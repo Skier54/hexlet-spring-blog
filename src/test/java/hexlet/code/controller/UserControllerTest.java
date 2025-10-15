@@ -1,6 +1,8 @@
 package hexlet.code.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.model.User;
+import hexlet.code.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -25,6 +27,9 @@ class UserControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     // Создание пользователя
     @Test
@@ -61,18 +66,29 @@ class UserControllerTest {
     // получения пользователя по id
     @Test
     void getUserById_returns200_andUser() throws Exception {
-        var userId = 1L;
-        mockMvc.perform(get("/api/users/{id}", userId))
+        var user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setEmail("john@example.com");
+
+        userRepository.save(user);
+        mockMvc.perform(get("/api/users/{id}", user.getId()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.firstName").exists())
-                .andExpect(jsonPath("$.lastName").exists());
+                .andExpect(jsonPath("$.lastName").exists())
+                .andExpect(jsonPath("$.email").value(user.getEmail()));
     }
 
     //обновления пользователя
     @Test
     void updateUser_returns200_andUser() throws Exception {
-        var userId = 1L;
+        var user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setEmail("john@example.com");
+
+        userRepository.save(user);
 
         var updatedData = Map.of(
                 "firstName", "Updated",
@@ -80,11 +96,11 @@ class UserControllerTest {
                 "email", "newemail@example.com"
         );
 
-        mockMvc.perform(put("/api/users/{id}", userId)
+        mockMvc.perform(put("/api/users/{id}", user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updatedData)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(userId))
+                .andExpect(jsonPath("$.id").value(user.getId()))
                 .andExpect(jsonPath("$.firstName").value("Updated"))
                 .andExpect(jsonPath("$.lastName").value("Name"))
                 .andExpect(jsonPath("$.email").value("newemail@example.com"));

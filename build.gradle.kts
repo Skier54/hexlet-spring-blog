@@ -50,7 +50,7 @@ tasks.check {
     dependsOn(tasks.jacocoTestReport)
 }
 
-sonarqube {
+sonar {
     properties {
         property("sonar.projectKey", "skier54_hexlet-spring-blog")
         property("sonar.organization", "skier54") // для SonarCloud
@@ -61,3 +61,4 @@ sonarqube {
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
+

@@ -54,11 +54,12 @@ sonar {
     properties {
         property("sonar.projectKey", "Skier54_hexlet-spring-blog")
         property("sonar.organization", "skier54") // для SonarCloud
-        property("sonar.host.url", "https://sonarcloud.io") // или ваш SonarQube
-        property("sonar.java.coveragePlugin", "jacoco")
-        property("sonar.junit.reportPaths", "build/test-results/test")
-        property("sonar.jacoco.reportPaths", "build/jacoco/test.exec")
+        //property("sonar.host.url", "https://sonarcloud.io") // или ваш SonarQube
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+        //property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.junit.reportPaths", "build/test-results/test")
+        //property("sonar.jacoco.reportPaths", "build/jacoco/test.exec")
+        //property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
 

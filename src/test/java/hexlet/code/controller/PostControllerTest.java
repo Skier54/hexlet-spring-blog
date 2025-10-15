@@ -3,6 +3,7 @@ package hexlet.code.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.model.Post;
 import hexlet.code.repository.PostRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,14 +32,26 @@ class PostControllerTest {
     @Autowired
     private PostRepository postRepository;
 
+    @BeforeEach
+    void setUp() {
+        postRepository.deleteAll();
+    }
+
     //Получение списка постов
     @Test
     void listPublished_returns200_andPage() throws Exception {
+        var post = new Post();
+        post.setTitle("Hello");
+        post.setContent("Hello Hello life!");
+        post.setPublished(true);
+        postRepository.save(post);
+
         mockMvc.perform(get("/api/posts")
                 .param("page", "0")
                 .param("size", "5"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray());
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].id").exists());
     }
 
     // Создание поста
@@ -107,9 +120,13 @@ class PostControllerTest {
     //удаления поста
     @Test
     void deletePost_returns204() throws Exception {
-        var postId = 1L;
+        var post = new Post();
+        post.setTitle("Hello");
+        post.setContent("Hello Hello life!");
+        post.setPublished(true);
+        postRepository.save(post);
 
-        mockMvc.perform(delete("/api/posts/{id}", postId))
+        mockMvc.perform(delete("/api/posts/{id}", post.getId()))
                 .andExpect(status().isNoContent());
     }
 }

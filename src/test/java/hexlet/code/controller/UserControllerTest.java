@@ -3,6 +3,7 @@ package hexlet.code.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,6 +32,11 @@ class UserControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @BeforeEach
+    void setUp() {
+        userRepository.deleteAll();
+    }
+
     // Создание пользователя
     @Test
     void createUser_returns201_andBody() throws Exception {
@@ -55,6 +61,12 @@ class UserControllerTest {
     // Получение списка пользователей
     @Test
     void getUsersList_returns200_andList() throws Exception {
+        var user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setEmail("john@example.com");
+        userRepository.save(user);
+
         mockMvc.perform(get("/api/users")
                 .param("page", "0")
                 .param("size", "10"))
@@ -70,8 +82,8 @@ class UserControllerTest {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setEmail("john@example.com");
-
         userRepository.save(user);
+
         mockMvc.perform(get("/api/users/{id}", user.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(user.getId()))
@@ -87,7 +99,6 @@ class UserControllerTest {
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setEmail("john@example.com");
-
         userRepository.save(user);
 
         var updatedData = Map.of(
@@ -109,9 +120,13 @@ class UserControllerTest {
     //удаления пользователя
     @Test
     void deleteUser_returns204() throws Exception {
-        var userId = 1L;
+        var user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setEmail("john@example.com");
+        userRepository.save(user);
 
-        mockMvc.perform(delete("/api/users/{id}", userId))
+        mockMvc.perform(delete("/api/users/{id}", user.getId()))
                 .andExpect(status().isNoContent());
     }
 }

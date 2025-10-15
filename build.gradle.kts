@@ -52,7 +52,7 @@ tasks.check {
 
 sonar {
     properties {
-        property("sonar.projectKey", "skier54_hexlet-spring-blog")
+        property("sonar.projectKey", "Skier54_hexlet-spring-blog")
         property("sonar.organization", "skier54") // для SonarCloud
         property("sonar.host.url", "https://sonarcloud.io") // или ваш SonarQube
         property("sonar.java.coveragePlugin", "jacoco")
@@ -61,4 +61,5 @@ sonar {
         property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
     }
 }
+
 

@@ -1,6 +1,8 @@
 package hexlet.code.controller;
 
+import hexlet.code.dto.dtoUser.UserDTO;
 import hexlet.code.exception.ResourceNotFoundException;
+import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -25,14 +27,19 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<User> indexUsers(
+    public Page<UserDTO> indexUsers(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return userRepository.findAll(pageable);
+        var userPage = userRepository.findAll(pageable);
+
+        return userPage.map(userMapper::toDTO);
         //var users = userRepository.findAll();
 
         //return users.stream().skip((long) (page - 1) * size).limit(size).toList();
@@ -40,27 +47,28 @@ public class UserController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public User showUser(@PathVariable Long id) {
+    public UserDTO showUser(@PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-        return user;
+        return userMapper.toDTO(user);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody User user) {
         //user.setId((long) userIdCounter.getAndIncrement());
         //users.add(user);
         //URI location = URI.create("/api/users/" + user.getId());
         var savedUser = userRepository.save(user);
+        var dto = userMapper.toDTO(savedUser);
         return ResponseEntity
                 .created(URI.create("/api/users/" + savedUser.getId()))
-                .body(savedUser);
+                .body(dto);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public User updateUser(@PathVariable Long id, @Valid @RequestBody User data) {
+    public UserDTO updateUser(@PathVariable Long id, @Valid @RequestBody User data) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
 
@@ -68,8 +76,9 @@ public class UserController {
         user.setFirstName(data.getFirstName());
         user.setLastName(data.getLastName());
         //user.setBirthday(data.getBirthday());
+        userRepository.save(user);
 
-        return userRepository.save(user);
+        return userMapper.toDTO(user);
     }
 
     @DeleteMapping("/{id}")

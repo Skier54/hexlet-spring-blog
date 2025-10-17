@@ -48,6 +48,10 @@ public class Post {
     @Column(nullable = false, updatable = false)  //не может быть ноль, не изменяемо
     private LocalDate createdAt;
 
+    //@ManyToOne(fetch = FetchType.EAGER)
+    //@JoinColumn(name = "user_id", nullable = false)
+    //private User user;
+
 //    public void setTitle(String title) {
 //        this.title = title;
 //        this.slug = generateSlug(title);

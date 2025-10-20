@@ -1,6 +1,9 @@
 package hexlet.code.controller;
 
+import hexlet.code.dto.dtoPost.PostCreateDTO;
 import hexlet.code.dto.dtoPost.PostDTO;
+import hexlet.code.dto.dtoPost.PostPatchDTO;
+import hexlet.code.dto.dtoPost.PostUpdateDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.PostMapper;
 import hexlet.code.model.Post;
@@ -14,10 +17,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +40,7 @@ public class PostController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<PostDTO> indexPosts(
-            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "10") Integer size) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -57,26 +62,40 @@ public class PostController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody Post post) {
-        var savedPost = postRepository.save(post);
-        var dto = postMapper.toDTO(post);
+    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody PostCreateDTO postData) {
+        var post = postMapper.toEntity(postData);
+        postRepository.save(post);
+        var postDTO = postMapper.toDTO(post);
         return ResponseEntity
-                .created(URI.create("/api/posts/" + savedPost.getId()))
-                .body(dto);
+                .created(URI.create("/api/posts/" + postDTO.getId()))
+                .body(postDTO);
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public PostDTO updatePost(@PathVariable Long id, @Valid @RequestBody Post data) {
+    public PostDTO updatePost(@PathVariable Long id, @Valid @RequestBody PostUpdateDTO postData) {
         var post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post with id " + id + " not found"));
 
-        post.setTitle(data.getTitle());
-        post.setContent(data.getContent());
-        post.setPublished(data.isPublished());
+        postMapper.toEntityUpdate(postData, post);
+        post.setUpdatedAt(LocalDate.from(LocalDateTime.now()));
         postRepository.save(post);
 
         return postMapper.toDTO(post);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<PostDTO> patchPost(@PathVariable Long id,
+                                             @RequestBody PostPatchDTO dto) {
+        var post = postRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        dto.getTitle().ifPresent(post::setTitle);
+        dto.getContent().ifPresent(post::setContent);
+        dto.getPublished().ifPresent(post::setPublished);
+
+        postRepository.save(post);
+        return ResponseEntity.ok(postMapper.toDTO(post));
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.3"
     id("org.sonarqube") version "6.3.1.5724"
+    kotlin("kapt") version "1.9.25"
 }
 
 group = "hexlet.code"
@@ -20,11 +21,17 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    implementation("org.openapitools:jackson-databind-nullable:0.2.7")
+
     implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
     implementation("net.datafaker:datafaker:2.5.0")
 
     implementation("org.projectlombok:lombok:1.18.40")
     annotationProcessor("org.projectlombok:lombok:1.18.40")
+
+    implementation("org.mapstruct:mapstruct:1.5.5.Final")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
+    testAnnotationProcessor("org.mapstruct:mapstruct-processor:1.5.5.Final")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")

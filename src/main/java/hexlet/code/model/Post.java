@@ -29,7 +29,7 @@ public class Post {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(unique = true)
+    //@Column (unique = true)
     @NotBlank(message = "Заголовок поста не может быть пустым")
     @Size(min = 3, max = 50, message = "Длина заголовка должна быть от 3 до 50 символов")
     private String title;

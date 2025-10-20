@@ -14,5 +14,5 @@ public class PostDTO {
     private boolean published;
     private LocalDate updatedAt;
     private LocalDate createdAt;
-    private Long userId;
+    //private Long userId;
 }
